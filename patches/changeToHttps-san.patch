@@ -1,0 +1,34 @@
+--- original/changeToHttps.php
++++ fixed/changeToHttps.php
+@@ -53,6 +53,8 @@
+ 	$installDir = str_replace('/','\\',$c_installDir);
+ 	if(empty($changeError)) {
+ 		//HTTPS VirtualHost is ready - Needs to create site certificate
++		// Modified 2026-09-28: include the VirtualHost name in the certificate SAN.
++		$siteSanType = filter_var($ServerName, FILTER_VALIDATE_IP) === false ? 'DNS' : 'IP';
+ 		$command = <<<EOF
+ Rem Wampserver installation variables
+ set installdir=$installDir
+@@ -75,8 +77,21 @@
+ if exist %DIRCERTS%\Server\Server.csr del %DIRCERTS%\Server\Server.csr
+ openssl req -new -sha256 -key %DIRCERTS%/Server/Server.key -out %DIRCERTS%/Server/Server.csr -subj "/C=FR/ST=Paris/L=Paris/O=Otomatic & Cie/OU=Wampserver/CN=%SERVLOCAL%"
+ Rem 10- Signature request for server certificate.
++Rem WAMP HTTPS SAN FIX: generate extensions for this VirtualHost.
++(
++echo [wamp_server]
++echo basicConstraints = critical, CA:FALSE
++echo keyUsage = critical, digitalSignature, keyEncipherment
++echo extendedKeyUsage = serverAuth
++echo subjectKeyIdentifier = hash
++echo authorityKeyIdentifier = keyid,issuer
++echo subjectAltName = {$siteSanType}:%SERVLOCAL%
++) > "%DIRCERTS%\Server\Server.ext"
++if errorlevel 1 exit /b 1
+ if exist %DIRCERTS%\Server\Server.crt del %DIRCERTS%\Server\Server.crt
+-openssl x509 -req -days 4383 -sha256 -in %DIRCERTS%/Server/Server.csr -CA %DIRCERTS%/Cacerts/Certificat.crt -CAkey %DIRCERTS%/Cacerts/Certificat.key -CAcreateserial -out %DIRCERTS%/Server/Server.crt
++openssl x509 -req -days 4383 -sha256 -in %DIRCERTS%/Server/Server.csr -CA %DIRCERTS%/Cacerts/Certificat.crt -CAkey %DIRCERTS%/Cacerts/Certificat.key -CAcreateserial -out %DIRCERTS%/Server/Server.crt -extfile "%DIRCERTS%/Server/Server.ext" -extensions wamp_server
++if errorlevel 1 exit /b 1
++del "%DIRCERTS%\Server\Server.ext"
+ openssl x509 -outform der -in %DIRCERTS%/Server/Server.crt -out %DIRCERTS%/Server/Server.der
+ openssl x509 -inform DER -outform PEM -in %DIRCERTS%/Server/Server.der -out %DIRCERTS%/Server/Server.pem
+ openssl crl2pkcs7 -nocrl -certfile %DIRCERTS%/Cacerts/Certificat.crt -certfile %DIRCERTS%/Server/Server.crt -out %DIRCERTS%/Server/%SERVLOCAL%.p7b

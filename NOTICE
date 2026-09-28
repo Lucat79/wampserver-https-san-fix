@@ -1,0 +1,18 @@
+This is an independent community patch, not an official Wampserver release.
+
+Upstream Wampserver project: https://sourceforge.net/projects/wampserver/
+The upstream project lists GNU General Public License version 2.0 (GPLv2).
+Upstream authors retain their copyright in the supplied source and configuration.
+The supplied files contain no additional copyright header; none was invented.
+
+Upstream material:
+- tests/fixtures/changeToHttps.original.php: original supplied source, unchanged.
+- tests/fixtures/openssl.cnf: original supplied configuration, unchanged.
+- scripts/changeToHttps.php: modified source, adding per-site SAN extensions and
+  checking failure during extension-file creation and certificate signing.
+- patches/changeToHttps-san.patch: source changes relative to the original.
+
+Changes and new installer, documentation and tests prepared on 2026-09-28.
+Repository owner: Lucat79. Original PHP fix confirmed on the reporting user's PC.
+New material is provided under GPL-2.0-only. See LICENSE for the full terms.
+No private keys, real site certificates, or passwords are included.

@@ -1,0 +1,6 @@
+{
+  "algorithm": "SHA-256, CRLF normalized to LF; all other bytes preserved",
+  "original": "5561ac4022d3c7dff871389264814fc624d73116b96d02c57a9aaa5e49a4896d",
+  "patched": "d0ae7090960518e3a1eaa1aec87b79ea1accd2a15c35a279a29785a7309edeef",
+  "previouslyDeliveredPatch": "92fbb00a6e7bbbd977a012f5ce0e5a52ab6be4f66d07115271412a815ff5ae05"
+}
